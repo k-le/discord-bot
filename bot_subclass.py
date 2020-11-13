@@ -40,7 +40,7 @@ async def jojo(ctx):
     await ctx.send(response)
 
 @bot.command(name='weather')
-async def weather(ctx, *, arg1):
+async def weather(ctx, postal_code, country):
     list_of_locations = reg.locations_for(arg1)
     city = list_of_locations[0]
     lat = city.lat
