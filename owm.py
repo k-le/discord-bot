@@ -51,6 +51,3 @@ def get_wind(weather_dict):
 
 def get_humidity(weather_dict):
     return weather_dict['main']['humidity']
-
-def get_city(weather_dict):
-    return weather_dict['name']
