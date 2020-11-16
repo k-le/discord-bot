@@ -43,18 +43,14 @@ def get_weather_conditions(weather_id):
 def get_temperature(weather_dict):
     kelvin = weather_dict['main']['temp']
     fahrenheit = ((kelvin - 273.15) * (9/5) + 32)
-    return fahrenheit
+    return '{0:.3g}'.format(fahrenheit)
+
+def get_wind(weather_dict):
+    wind_speed = weather_dict['wind']['speed']
+    return '{0:.3g}'.format(wind_speed*2.237)
+
+def get_humidity(weather_dict):
+    return weather_dict['main']['humidity']
 
 def get_city(weather_dict):
     return weather_dict['name']
-
-
-
-postal_code = get_postal_code()
-weather_dict = get_weather_dict(postal_code)
-weather_id = get_weather_id(weather_dict)
-print(get_weather_conditions(weather_id))
-
-
-loc_dict = smartystreets.get_loc_dict(smartystreets.AUTH_ID, smartystreets.AUTH_TOKEN, postal_code)
-print(smartystreets.get_state(loc_dict))

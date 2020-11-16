@@ -1,11 +1,11 @@
 # bot_subclass.py
 # testing bot subclass from Discord extensions package
 
+import owm
+import smartystreets
 import os
 import discord
 import random
-import pyowm
-import json
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -14,9 +14,6 @@ TOKEN = os.getenv('DISCORD_TOKEN') # loading Discord Bot token from .env
 
 # OpenWeatherMap API
 OWMKey = os.getenv('OWM_API') # retrieving OWM Key
-owm = pyowm.OWM(OWMKey) # establishing connection to OWM API
-reg = owm.city_id_registry() # using OWM city ID registry to look up cities given their names
-mgr = owm.weather_manager() # usage of OWM weather manager
 
 # instead of the Client superclass, we utilize the Bot subclass
 bot = commands.Bot(command_prefix='!')
@@ -40,25 +37,25 @@ async def jojo(ctx):
     await ctx.send(response)
 
 @bot.command(name='weather')
-async def weather(ctx, postal_code, country):
-    list_of_locations = reg.locations_for(arg1)
-    city = list_of_locations[0]
-    lat = city.lat
-    lon = city.lon
-    current_forecast_json = mgr.weather_at_coords(lat, lon)
+async def weather(ctx, postal_code):
+    weather_dict = owm.get_weather_dict(postal_code)
+    loc_dict = smartystreets.get_loc_dict(postal_code)
 
-    weather_dict = current_forecast_json.to_dict()
-    city_name = weather_dict['location']['name']
-    city_country = weather_dict['location']['country']
-    temp_in_k = weather_dict['weather']['temperature']['temp']
-    temp_in_fahrenheit = ((temp_in_k - 273.15) * (9/5) + 32)
-    cloudiness = weather_dict['weather']['clouds']
+    weather_id = owm.get_weather_id(weather_dict)
 
-    await ctx.send(f'City: {city_name}\n'
-                   f'Country: {city_country} \n'
-                   f'Temperature: {"{0:.2g}".format(temp_in_fahrenheit)}° F \n'
-                   f'Clouds: {cloudiness}%'
-                   )
+    temp = owm.get_temperature(weather_dict)
+    weather_cond = owm.get_weather_conditions(weather_id)
+    wind_speed = owm.get_wind(weather_dict)
+    humidity = owm.get_humidity(weather_dict)
+
+    city = owm.get_city(weather_dict)
+    state = smartystreets.get_state(loc_dict)
+
+    await ctx.send(f'{city}, {state} \n'
+                   f'{temp}° F \n'
+                   f'Currently {weather_cond} \n'
+                   f'Winds at {wind_speed}mph \n'
+                   f'{humidity}% Humidity')
 
 bot.run(TOKEN)
 
