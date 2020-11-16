@@ -37,8 +37,8 @@ async def weather(ctx, postal_code):
     :param postal_code: Int, 5-digit postal code for location purposes
     :return:
     """
-    weather_dict = owm.get_weather_dict(postal_code)    # creates a nested dictionary of weather info from parsed OpenWeatherMap JSON data
-    loc_dict = smartystreets.get_loc_dict(postal_code)  # creates a nested dictionary of location info from parsed SmartyStreets JSON data
+    weather_dict = owm.get_weather_dict(postal_code)    # creates a nested dictionary of weather info from parsed OpenWeatherMap JSON object
+    loc_dict = smartystreets.get_loc_dict(postal_code)  # creates a nested dictionary of location info from parsed SmartyStreets JSON object
 
     weather_id = owm.get_weather_id(weather_dict)   # grabs weather id to identify weather conditions
     weather_cond = owm.get_weather_conditions(weather_id)   # weather conditions based on id parsed, snow, rain, clouds, etc.
