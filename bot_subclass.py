@@ -1,11 +1,15 @@
 # bot_subclass.py
 # testing bot subclass from Discord extensions package
 
+import os
+from dotenv import load_dotenv
+
+import youtube_dl
+from discord.ext import commands
+
 import owm
 import smartystreets
-import os
-from discord.ext import commands
-from dotenv import load_dotenv
+from youtube import YouTubeClient
 
 load_dotenv()
 # Discord Token
@@ -14,13 +18,11 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 # OpenWeatherMap API Key
 OWMKey = os.getenv('OWM_API')
 
+# YouTube API
+ytKEY = os.getenv('GOOGLE_KEY')
+
 # instead of the Client superclass, we utilize the Bot subclass
 bot = commands.Bot(command_prefix='!')
-
-# on_ready() called when bot has finished setting up
-@bot.event
-async def on_ready():
-    print(f'{bot.user.name} has connected to Discord!')
 
 # //-------------------------------------------------------
 # bots must utilize arbitrary keywords (set by the programmer) for events to be called
@@ -37,6 +39,9 @@ async def weather(ctx, postal_code):
     :param postal_code: Int, 5-digit postal code for location purposes
     :return:
     """
+    if ctx.author == bot.user:
+        return
+
     weather_dict = owm.get_weather_dict(postal_code)    # creates a nested dictionary of weather info from parsed OpenWeatherMap JSON object
     loc_dict = smartystreets.get_loc_dict(postal_code)  # creates a nested dictionary of location info from parsed SmartyStreets JSON object
 
@@ -55,6 +60,31 @@ async def weather(ctx, postal_code):
                    f'Currently {weather_cond} \n'
                    f'Winds at {wind_speed}mph \n'
                    f'{humidity}% Humidity')
+
+
+@bot.command(name='play', help='Work in Progress: Given a title, plays a video from YouTube')
+async def play(ctx, *, video_title):
+    if ctx.author == bot.user:
+        return
+
+    youtube = YouTubeClient(KEY=ytKEY)
+
+    videoId = youtube.get_video_id(title=video_title)
+    youtube.add_vid_to_playlist(videoId=videoId)
+
+    if ctx.author.voice is None:
+        await ctx.send("User is not connected to a channel.")
+        raise RuntimeError("User is not connected to a channel.")
+        return
+    else:
+        voice_channel = ctx.author.voice.channel
+        vc = await voice_channel.connect()
+
+    await ctx.send(f'Added https://www.youtube.com/watch?v={videoId["videoId"]} to the queue.')
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user.name} has connected to Discord!')
 
 bot.run(TOKEN)
 
