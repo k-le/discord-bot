@@ -69,6 +69,8 @@ async def weather(ctx, postal_code):
 
 @bot.command(name='play', help='Given a title, plays a video from YouTube')
 async def play(ctx, *, video_title):
+  """ THIS COMMAND IS CURRENTLY A WORK IN PROGRESS AND IS NOT FULLY FUNCTIONAL YET
+  """
     if ctx.author == bot.user:
         return
 
@@ -105,8 +107,6 @@ async def play(ctx, *, ingredient):
                               f'{recipe["description"]}\n'
                               f'{recipe["recipe_page"]}\n')
         count += 1
-
-    # await ctx.send(to_print)
 
 
 @bot.event
